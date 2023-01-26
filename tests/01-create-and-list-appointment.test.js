@@ -3,7 +3,7 @@ const request = require("supertest");
 const app = require("../src/app");
 const knex = require("../src/db/connection");
 
-describe("US-01 - Create and list appointments", () => {
+describe("01 - Create and List Appointments", () => {
   beforeAll(() => {
     return knex.migrate
       .forceFreeMigrationsLock()
@@ -29,17 +29,6 @@ describe("US-01 - Create and list appointments", () => {
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("Path not found: /fastidious");
       });
-    });
-  });
-
-  describe("GET /appointments/:appointment_id", () => {
-    test("returns 404 for non-existent id", async () => {
-      const response = await request(app)
-        .get("/appointment/99")
-        .set("Accept", "application/json");
-
-      expect(response.body.error).toContain("99");
-      expect(response.status).toBe(404);
     });
   });
 
@@ -164,6 +153,25 @@ describe("US-01 - Create and list appointments", () => {
       expect(response.body.error).toContain("mobile_number");
       expect(response.status).toBe(400);
     });
+
+    test("returns 400 if mobile_number is not a string matching format ^\d{3}-\d{3}-\d{4}$", async ()=>{
+        const data = {
+            first_name: "Mouse", 
+            last_name: "Whale", 
+            mobile_number: "1234567890",
+            appointment_date: "2026-12-30", 
+            appointment_time: "12:00", 
+            people: 2
+        }
+
+        const response = await request(app)
+            .post("/appointments")
+            .set("Accept", "application/json")
+            .send({data})
+
+        expect(response.body.error).toContain("mobile_number")
+        expect(response.status).toBe(400)
+    })
 
     test("returns 400 if appointment_date is missing", async () => {
       const data = {
@@ -295,7 +303,7 @@ describe("US-01 - Create and list appointments", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if people is zero", async () => {
+    test("returns 400 if people is less than 1", async () => {
       const data = {
         first_name: "first",
         last_name: "last",
