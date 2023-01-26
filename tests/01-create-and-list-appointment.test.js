@@ -369,5 +369,26 @@ describe("01 - Create and List Appointments", () => {
       );
       expect(response.status).toBe(201);
     });
+
+    test("updates appointments status to book once submitted", async () => {
+        const data = {
+          first_name: "first",
+          last_name: "last",
+          mobile_number: "800-555-1212",
+          appointment_date: "2025-01-01",
+          appointment_time: "17:30",
+          people: 2,
+        };
+  
+        const response = await request(app)
+          .post("/appointments")
+          .set("Accept", "application/json")
+          .send({ data });
+  
+        expect(response.body.error).toBeUndefined();
+        expect(response.body.data.status).toEqual("booked");
+        expect(response.status).toBe(201);
+      });
+
   });
 });

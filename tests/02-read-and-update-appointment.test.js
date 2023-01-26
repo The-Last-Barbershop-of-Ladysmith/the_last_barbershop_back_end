@@ -52,7 +52,7 @@ describe("02 - Read and Update Appointments", () => {
         const appointmentURL = `/appointment/${newAppointmentId}`
 
         describe("GET /appointments/:appointment_id", () => {
-            
+
             test("returns 404 for non-existent id", async () => {
                 const response = await request(app)
                     .get("/appointment/99")
@@ -66,7 +66,7 @@ describe("02 - Read and Update Appointments", () => {
                 const response = await request(app)
                     .get(appointmentURL)
                     .set("Accept", "application/json")
-    
+
                 expect(response.body.error).toBeUndefined()
                 expect(response.status).toBe(200)
                 expect(response.body.data).toEqual(
@@ -394,88 +394,122 @@ describe("02 - Read and Update Appointments", () => {
 
             test("returns 400 if people is missing", async () => {
                 const data = {
-                  first_name: "first",
-                  last_name: "last",
-                  mobile_number: "800-555-1212",
-                  appointment_date: "2025-01-01",
-                  appointment_time: "12:00",
-                };
-          
-                const response = await request(app)
-                  .post(appointmentURL)
-                  .set("Accept", "application/json")
-                  .send({ data });
-          
-                expect(response.body.error).toContain("people");
-                expect(response.status).toBe(400);
-              });
-          
-              test("returns 400 if people is less than 1", async () => {
-                const data = {
-                  first_name: "first",
-                  last_name: "last",
-                  mobile_number: "800-555-1212",
-                  appointment_date: "2025-01-01",
-                  appointment_time: "12:00",
-                  people: 0,
-                };
-          
-                const response = await request(app)
-                  .post(appointmentURL)
-                  .set("Accept", "application/json")
-                  .send({ data });
-          
-                expect(response.body.error).toContain("people");
-                expect(response.status).toBe(400);
-              });
-          
-              test("returns 400 if people is not a number", async () => {
-                const data = {
-                  first_name: "first",
-                  last_name: "last",
-                  mobile_number: "800-555-1212",
-                  appointment_date: "2025-01-01",
-                  appointment_time: "12:00",
-                  people: "2",
-                };
-          
-                const response = await request(app)
-                  .post(appointmentURL)
-                  .set("Accept", "application/json")
-                  .send({ data });
-          
-                expect(response.body.error).toContain("people");
-                expect(response.status).toBe(400);
-              });
-          
-              test("returns 200 if data is valid", async () => {
-                const data = {
-                  first_name: "first",
-                  last_name: "last",
-                  mobile_number: "800-555-1212",
-                  appointment_date: "2025-01-01",
-                  appointment_time: "12:00",
-                  people: 2,
-                };
-          
-                const response = await request(app)
-                  .post(appointmentURL)
-                  .set("Accept", "application/json")
-                  .send({ data });
-          
-                expect(response.body.error).toBeUndefined();
-                expect(response.body.data).toEqual(
-                  expect.objectContaining({
                     first_name: "first",
                     last_name: "last",
                     mobile_number: "800-555-1212",
-                    appointment_date: expect.stringContaining("2025-01-01"),
-                    appointment_time: expect.stringContaining("12:00"),
+                    appointment_date: "2025-01-01",
+                    appointment_time: "12:00",
+                };
+
+                const response = await request(app)
+                    .put(appointmentURL)
+                    .set("Accept", "application/json")
+                    .send({ data });
+
+                expect(response.body.error).toContain("people");
+                expect(response.status).toBe(400);
+            });
+
+            test("returns 400 if people is less than 1", async () => {
+                const data = {
+                    first_name: "first",
+                    last_name: "last",
+                    mobile_number: "800-555-1212",
+                    appointment_date: "2025-01-01",
+                    appointment_time: "12:00",
+                    people: 0,
+                };
+
+                const response = await request(app)
+                    .put(appointmentURL)
+                    .set("Accept", "application/json")
+                    .send({ data });
+
+                expect(response.body.error).toContain("people");
+                expect(response.status).toBe(400);
+            });
+
+            test("returns 400 if appointment status is not booked", async () => {
+                const cancelledAppointment = {
+                    first_name: "Mouse",
+                    last_name: "Whale",
+                    mobile_number: "800-555-1212",
+                    appointment_date: "2026-12-30",
+                    appointment_time: "12:00",
                     people: 2,
-                  })
+                    status: "cancelled"
+                }
+
+                const cancelledAppointmentId = await knex("appointments")
+                    .insert(newAppointment, "appointment_id")
+                    .then((data) => data[0])
+
+                const data = {
+                    first_name: "first",
+                    last_name: "last",
+                    mobile_number: "800-555-1212",
+                    appointment_date: "2025-01-01",
+                    appointment_time: "12:00",
+                    people: 0,
+                }
+
+                const response = await request(app)
+                    .put(`/appointments/${cancelledAppointmentId}`)
+                    .set("Accept", "application/json")
+                    .send({data})
+
+                expect(response.body.error).toContain("status")
+                expect(response.status).toBe(400)
+
+            })
+
+            test("returns 400 if people is not a number", async () => {
+                const data = {
+                    first_name: "first",
+                    last_name: "last",
+                    mobile_number: "800-555-1212",
+                    appointment_date: "2025-01-01",
+                    appointment_time: "12:00",
+                    people: "2",
+                };
+
+                const response = await request(app)
+                    .put(appointmentURL)
+                    .set("Accept", "application/json")
+                    .send({ data });
+
+                expect(response.body.error).toContain("people");
+                expect(response.status).toBe(400);
+            });
+
+            test("returns 200 if data is valid", async () => {
+                const data = {
+                    first_name: "first",
+                    last_name: "last",
+                    mobile_number: "800-555-1212",
+                    appointment_date: "2025-01-01",
+                    appointment_time: "12:00",
+                    people: 2,
+                };
+
+                const response = await request(app)
+                    .put(appointmentURL)
+                    .set("Accept", "application/json")
+                    .send({ data });
+
+                expect(response.body.error).toBeUndefined();
+                expect(response.body.data).toEqual(
+                    expect.objectContaining({
+                        first_name: "first",
+                        last_name: "last",
+                        mobile_number: "800-555-1212",
+                        appointment_date: expect.stringContaining("2025-01-01"),
+                        appointment_time: expect.stringContaining("12:00"),
+                        people: 2,
+                    })
                 );
                 expect(response.status).toBe(200);
-              });
+            });
 
         });
     });
