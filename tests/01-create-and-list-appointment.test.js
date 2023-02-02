@@ -33,6 +33,7 @@ describe("01 - Create and List Appointments", () => {
   });
 
   describe("POST /appointments", () => {
+                                                                                                     
     test("returns 400 if data is missing", async () => {
       const response = await request(app)
         .post("/appointments")

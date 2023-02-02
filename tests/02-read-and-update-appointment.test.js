@@ -67,7 +67,7 @@ describe("02 - Read and Update Appointments", () => {
                     .get(appointmentURL)
                     .set("Accept", "application/json")
 
-                expect(response.body.error).toBeUndefined()
+                expect(response.body.error).toContain('addmin_id')
                 expect(response.status).toBe(200)
                 expect(response.body.data).toEqual(
                     expect.objectContaining({
