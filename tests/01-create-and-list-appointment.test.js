@@ -3,6 +3,8 @@ const request = require("supertest");
 const app = require("../src/app");
 const knex = require("../src/db/connection");
 
+/** TODO - Add tests to ensure appoinment is not scheduled for a date and time already booked */
+
 describe("01 - Create and List Appointments", () => {
   beforeAll(() => {
     return knex.migrate
