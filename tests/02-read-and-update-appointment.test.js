@@ -3,6 +3,8 @@ const request = require("supertest");
 const app = require("../src/app");
 const knex = require("../src/db/connection");
 
+/** TODO - Add tests to ensure appoinment is not scheduled for a date already booked */
+
 describe("02 - Read and Update Appointments", () => {
     beforeAll(() => {
         return knex.migrate
@@ -84,7 +86,7 @@ describe("02 - Read and Update Appointments", () => {
 
 
         describe("PUT /appointments/:appointment_id", async () => {
-
+                
             test("returns 404 if appoinment_id is non-existent", async () => {
                 const data = {
                     first_name: "Mouse",
