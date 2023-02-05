@@ -5,7 +5,7 @@ const knex = require("../src/db/connection");
 
 /** TODO complete test to include all routes that include POST, PUT, and DELETE ENDPOINTS */
 
-describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
+describe("04 - Provide JWT and CSRF Tokens and check authorization", async () => {
 
     beforeAll(() => {
         return knex.migrate
@@ -47,29 +47,42 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
      * 
      *  **/
 
+    const csrfResponse = await request(app)
+    .get("/csrf")
+    .set("Accept", "application/json")
+
+    const csrfCookie = csrfResponse.cookies('csrfToken')
+
     describe("GET /csrf", () => {
         test("returns the csrf token", async () => {
             const response = await request(app)
                 .get('/csrf')
                 .set("Accept", "application/json")
-
-            expecct(response.status).toBe(200)
-            expecct(response.body.data).toBeTruthy()
+    
+            expect(response.status).toBe(200)
+            expect(response.body.data).toBeTruthy()
         })
         test("sends a cookie name csrfToken within the response", async () => {
             const response = await request(app)
                 .get('/csrf')
-
-            expect(response.cookie.csrfToken).toBeTruthy()
+            
+            /** Read response header of Set-Cookie to see if it includes a given text property */
+            const cookieHasProperty = (property) =>{
+                return response.headers['set-cookie'][0].includes(property)
+            }
+    
+            expect(cookieHasProperty('csrfToken')).toBeTruthy()
+            expect(cookieHasProperty('Max-Age=86400')).toBeTruthy()
+            expect(cookieHasProperty('HttpOnly')).toBeTruthy()
+            expect(cookieHasProperty('Path=/')).toBeTruthy()
+            expect(cookieHasProperty('Secure')).toBeTruthy()
             expect(response.status).toBe(200)
         })
     })
 
     describe("POST /appointments", () => {
         test("returns 403 if hashed csrf token in cookies is not sent with request and csrf token not sent in request headers", async () => {
-            const csrfResponse = await request(app)
-                .get("/csrf")
-                .set("Accept", "application/json")
+
 
             const data = {
                 first_name: "first",
@@ -106,7 +119,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
             const response = await (app)
                 .post('/appointments')
                 .set("Accept", "application/json")
-                .set('Cookie', csrfResponse.headers['set-cookie'])
+                .set('Cookie', [...csrfResponse.headers['set-cookie']])
                 .send(data)
 
             expect(response.status).toBe(403)
