@@ -373,7 +373,7 @@ describe("01 - Create and List Appointments", () => {
       expect(response.status).toBe(201);
     });
 
-    test("updates appointments status to book once submitted", async () => {
+    test("updates appointment status to book once submitted", async () => {
         const data = {
           first_name: "first",
           last_name: "last",
