@@ -173,30 +173,30 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", async () =>
         })
     })
 
-    const newAppointmentData = {
-        first_name: "CsrfToken",
-        last_name: "Test",
-        mobile_number: "999-999-9999",
-        appointment_date: "2025-01-18",
-        appointment_time: "13:30",
-        people: 1,
-    }
+    describe("PUT /appointments", async () => {
 
-    const newAppointment = await knex('appointments')
-        .insert(newAppointmentData, "*")
-        .then((data) => data[0])
+        const newAppointmentData = {
+            first_name: "CsrfToken",
+            last_name: "Test",
+            mobile_number: "999-999-9999",
+            appointment_date: "2025-01-18",
+            appointment_time: "13:30",
+            people: 1,
+        }
 
-    const data = {
-        first_name: "CsrfToken",
-        last_name: "Accepted",
-        mobile_number: "999-999-9999",
-        appointment_date: "2025-01-18",
-        appointment_time: "13:30",
-        people: 1,
-    }
+        const newAppointment = await knex('appointments')
+            .insert(newAppointmentData, "*")
+            .then((data) => data[0])
 
-    describe("PUT /appointments", () => {
-        
+        const data = {
+            first_name: "CsrfToken",
+            last_name: "Accepted",
+            mobile_number: "999-999-9999",
+            appointment_date: "2025-01-18",
+            appointment_time: "13:30",
+            people: 1,
+        }
+
         test("returns 403 if hashed csrf token in cookies is not sent with request and csrf token not sent in request headers", async () => {
 
             const response = await (app)
@@ -269,5 +269,64 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", async () =>
         })
     })
 
+    describe("POST /users/login", () => {
+        test("returns 403 if hashed csrf token in cookies is not sent with request and csrf token not sent in request headers", async () => {
 
+            const data = {
+                admin_name: "JWT TEST",
+                password: "admin"
+            }
+
+            const response = await (app)
+                .post('/users/login')
+                .set("Accept", "application/json")
+                .send(data)
+
+            expect(response.status).toBe(403)
+            expect(response.body.error).toContain("csrf")
+        })
+
+        test("returns 403 if csrf token is not in request headers", async () => {
+            const csrfResponse = await request(app)
+                .get("/csrf")
+                .set("Accept", "application/json")
+
+            const data = {
+                admin_name: "JWT TEST",
+                password: "admin"
+            }
+
+            const response = await (app)
+                .post('/users/login')
+                .set("Accept", "application/json")
+                .set('Cookie', [...csrfResponse.headers['set-cookie']])
+                .send(data)
+
+            expect(response.status).toBe(403)
+            expect(response.body.error).toContain("csrf")
+        })
+
+        test("returns 403 if hashed csrf token in cookies is not sent with request", async () => {
+            const csrfResponse = await request(app)
+                .get("/csrf")
+                .set("Accept", "application/json")
+
+            const data = {
+                admin_name: "JWT TEST",
+                password: "admin"
+            }
+
+            const response = await (app)
+                .post('/users/login')
+                .set("Accept", "application/json")
+                .set('x-csrf-token', csrfResponse.body.data)
+                .send(data)
+
+            expect(response.status).toBe(403)
+            expect(response.body.error).toContain("csrf")
+        })
+
+        /**TODO - returns 201 on valid POST requests with valid CSRF token and sends user to body with JWT token in cookie */
+
+    })
 })
