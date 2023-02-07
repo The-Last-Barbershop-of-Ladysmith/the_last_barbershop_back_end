@@ -29,19 +29,6 @@ describe("01 - Create Read and Update Admins", () => {
         return await knex.migrate.rollback(null, true).then(() => knex.destroy());
     });
 
-    describe("App", () => {
-        describe("not found handler", () => {
-            test("returns 404 for non-existent route", async () => {
-                const response = await request(app)
-                    .get("/fastidious")
-                    .set("Accept", "application/json");
-
-                expect(response.status).toBe(404);
-                expect(response.body.error).toBe("Path not found: /fastidious");
-            });
-        });
-    });
-
     describe("POST /admins", () => {
 
         test("returns 400 if data is missing", async () => {
@@ -185,7 +172,7 @@ describe("01 - Create Read and Update Admins", () => {
         })
 
         test("returns 400 if role is empty", async () => {
-            d
+        
             const data = {
                 admin_name: "John",
                 mobile_number: "123-456-7890",
