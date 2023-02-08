@@ -2,7 +2,7 @@ const request = require("supertest");
 
 const app = require("../src/app");
 const knex = require("../src/db/connection");
-const { generatePassword } = require("../src/utils/password-utils");
+const { generateHashedPassword } = require("../src/utils/password-utils");
 
 describe("01 - Create Read and Update Admins", () => {
 
@@ -217,7 +217,7 @@ describe("01 - Create Read and Update Admins", () => {
                 .set("Accept", "application/json")
                 .send({ data });
 
-            const hashedPassword = await generatePassword(data.password)
+            const hashedPassword = await generateHashedPassword(data.password)
 
             expect(response.body.error).toBeUndefined();
             expect(response.body.data).toEqual(
@@ -369,7 +369,7 @@ describe("01 - Create Read and Update Admins", () => {
             const newAdmin = {
                 admin_name: "Maria",
                 mobile_number: "800-555-5555",
-                password: generatePassword('apples'),
+                password: generateHashedPassword('apples'),
                 role: "admin",
             }
 
@@ -465,11 +465,11 @@ describe("01 - Create Read and Update Admins", () => {
             };
 
             const response = await request(app)
-                .put()
+                .put(putURL)
                 .set("Accept", "application/json")
                 .send({ data });
 
-            const hashedPassword = await generatePassword(data.password)
+            const hashedPassword = await generateHashedPassword(data.password)
 
             expect(response.body.error).toBeUndefined();
             expect(response.body.data).toEqual(
