@@ -1,7 +1,38 @@
 {
+  "name": "the-last-barbershop-back-end",
+  "version": "1.0.0",
+  "description": "Backend API for The Last Barbershop Website",
+  "main": "src/server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The-Last-Barbershop-of-Ladysmith/the_last_barbershop_back_end"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "start:dev": "nodemon src/server.js",
+    "test": "npx cross-env LOG_LEVEL=warn jest --colors --runInBand --detectOpenHandles --forceExit --config ./tests/jest.config.js",
+    "test:1": "npm run test -- 01",
+    "test:drop-database": "node tests/drop-database",
+    "test:start": "npx cross-env LOG_LEVEL=warn NODE_ENV=test npm run test:start:run",
+    "test:start:run": "run-s test:drop-database start "
+  },
   "dependencies": {
-    "dotenv": "^16.0.1",
-    "knex": "^2.0.0",
-    "pg": "^8.7.3"
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "knex": "^0.21.12",
+    "nanoid": "^3.1.20",
+    "npm-run-all": "^4.1.5",
+    "pg": "^8.5.1",
+    "pino": "^6.11.0",
+    "pino-http": "^5.3.0",
+    "pino-pretty": "^4.3.0"
+  },
+  
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
+    "supertest": "^6.1.1"
   }
 }
