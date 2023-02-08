@@ -1,7 +1,9 @@
 const request = require("supertest");
+const bcrypt = require('bcrypt')
 
 const app = require("../src/app");
 const knex = require("../src/db/connection");
+const { generateHashedPassword } = require("../src/utils/password-utils");
 
 /** TODO complete test to include all routes that include POST, PUT, and DELETE ENDPOINTS */
 
@@ -269,18 +271,27 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", async () =>
         })
     })
 
-    describe("POST /users/login", () => {
+    describe("POST /users/login", async () => {
+
+        const newAdmin = {
+            admin_name: "JWT TEST",
+            mobile_number: '777-777-7777',
+            password: generateHashedPassword("admin"),
+            role: "admin"
+        }
+        const { mobile_number, password } = newAdmin
+        await knex('admins').insert({ newAdmin })
+
+        const data = { mobile_number, password: 'admin' }
+
         test("returns 403 if hashed csrf token in cookies is not sent with request and csrf token not sent in request headers", async () => {
 
-            const data = {
-                admin_name: "JWT TEST",
-                password: "admin"
-            }
+
 
             const response = await (app)
                 .post('/users/login')
                 .set("Accept", "application/json")
-                .send(data)
+                .send({ data })
 
             expect(response.status).toBe(403)
             expect(response.body.error).toContain("csrf")
@@ -291,10 +302,6 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", async () =>
                 .get("/csrf")
                 .set("Accept", "application/json")
 
-            const data = {
-                admin_name: "JWT TEST",
-                password: "admin"
-            }
 
             const response = await (app)
                 .post('/users/login')
@@ -311,11 +318,6 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", async () =>
                 .get("/csrf")
                 .set("Accept", "application/json")
 
-            const data = {
-                admin_name: "JWT TEST",
-                password: "admin"
-            }
-
             const response = await (app)
                 .post('/users/login')
                 .set("Accept", "application/json")
@@ -326,7 +328,50 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", async () =>
             expect(response.body.error).toContain("csrf")
         })
 
-        /**TODO - returns 201 on valid POST requests with valid CSRF token and sends user to body with JWT token in cookie */
+        /** JWT strategy will be to send the user a JWT token in the cookies to be used for authentification of admins. 
+         * 
+         * JWT will be sent as an HTTPOnly cookie 
+         * 
+         * A mock authentification cookie will be sent to the user with their admin_id to verify that they are authenticated on the front-end
+         * 
+         * Both cookies will expire within 24 hours and should be provided on routes that allow the performance of admin duties and viewing admin only routes
+         * 
+         * (tests for admin routes and duties will be specified on test 5,6,7,and 9)
+         */
+        test('return 200 for VALID POST request with valid CSRF token and sends user a JSON Web Token and userId in the cookies', async () => {
+            const csrfResponse = await request(app)
+                .get("/csrf")
+                .set("Accept", "application/json")
 
+            const response = await (app)
+                .post('/appointments')
+                .set("Accept", "application/json")
+                .set('x-csrf-token', csrfResponse.body.data)
+                .set('Cookie', csrfResponse.headers['set-cookie'])
+                .send(data)
+
+            expect(response.body.error).toBeUndefined();
+            expect(response.body.data).toEqual(
+                expect.objectContaining({
+                    admin_name: "JWT TEST",
+                    mobile_number: '777-777-7777',
+                    password: generateHashedPassword("admin"),
+                    role: "admin"
+                })
+            );
+            /** Read response header of Set-Cookie to see if it includes a given text property */
+            const cookieHasProperty = (property) => {
+                return response.headers['set-cookie'][0].includes(property)
+            }
+
+            expect(cookieHasProperty('JWT_Token')).toBeTruthy()
+            expect(cookieHasProperty('Max-Age=86400')).toBeTruthy()
+            expect(cookieHasProperty('HttpOnly')).toBeTruthy()
+            expect(cookieHasProperty('Path=/')).toBeTruthy()
+            expect(cookieHasProperty('Secure')).toBeTruthy()
+
+            expect(cookieHasProperty('admin_id')).toBeTruthy()
+            expect(response.status).toBe(200)
+        })
     })
 })
