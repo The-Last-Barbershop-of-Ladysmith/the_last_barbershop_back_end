@@ -33,8 +33,12 @@ describe("02 - Read and Update Appointments", () => {
         });
 
         test("returns 200 for existing id", async () => {
-            
-            const appoinment = await knex('appointments').where({mobile_number: "800-555-1212"}).first()
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
 
             const response = await request(app)
                 .get(appointmentURL)
@@ -59,6 +63,7 @@ describe("02 - Read and Update Appointments", () => {
     describe("PUT /appointments/:appointment_id", async () => {
 
         test("returns 404 if appoinment_id is non-existent", async () => {
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -67,8 +72,9 @@ describe("02 - Read and Update Appointments", () => {
                 appointment_time: "12:00",
                 people: 2,
             }
+
             const response = await request(app)
-                .put(appointmentURL)
+                .put("/appointment/99")
                 .set("Accept", "application/json")
                 .send(data)
 
@@ -78,6 +84,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if data missing", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const response = await request(app)
                 .put(appointmentURL)
                 .set("Accept", "application/json")
@@ -88,6 +101,12 @@ describe("02 - Read and Update Appointments", () => {
         });
 
         test("returns 400 if first_name is missing", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
 
             const data = {
                 last_name: "Whale",
@@ -107,6 +126,12 @@ describe("02 - Read and Update Appointments", () => {
 
         test("returns 400 if first_name is empty", async () => {
 
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "",
                 last_name: "Whale",
@@ -125,6 +150,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if last_name is missing", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 mobile_number: "800-555-1212",
@@ -143,6 +175,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if last_name is empty", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "",
@@ -162,6 +201,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if mobile_number is missing", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -179,6 +225,12 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if mobile_number is empty", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -197,6 +249,10 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if mobile_number is not a string matching format ^\d{3}-\d{3}-\d{4}$", async () => {
+
+            const appoinment = await knex('appointments').where({ mobile_number: "800-555-1212", status: "booked" }).first()
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -216,6 +272,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if mobile_number is not a string of numbers", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -235,6 +298,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if mobile_number is not a string not length of 10", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -254,6 +324,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if appointment_date is missing", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -272,6 +349,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if appointment_date is empty", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -291,6 +375,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if appointment_date is not a date in format YYYY-MM-DD", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -310,6 +401,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if appointment_time is missing", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -328,6 +426,12 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if appointment_time is empty", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -347,6 +451,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if appointment_time is not a time format HH:MM", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "Mouse",
                 last_name: "Whale",
@@ -366,6 +477,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if people is missing", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "first",
                 last_name: "last",
@@ -384,6 +502,13 @@ describe("02 - Read and Update Appointments", () => {
         });
 
         test("returns 400 if people is less than 1", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "first",
                 last_name: "last",
@@ -403,19 +528,9 @@ describe("02 - Read and Update Appointments", () => {
         });
 
         test("returns 400 if appointment status is not booked", async () => {
-            const cancelledAppointment = {
-                first_name: "Mouse",
-                last_name: "Whale",
-                mobile_number: "800-555-1212",
-                appointment_date: "2026-12-30",
-                appointment_time: "12:00",
-                people: 2,
-                status: "cancelled"
-            }
-
-            const cancelledAppointmentId = await knex("appointments")
-                .insert(newAppointment, "appointment_id")
-                .then((data) => data[0])
+            const cancelledAppointment = await knex("appointments")
+                .where({ mobile_number: "800-555-1212", status: "cancelled" })
+                .first()
 
             const data = {
                 first_name: "first",
@@ -423,11 +538,11 @@ describe("02 - Read and Update Appointments", () => {
                 mobile_number: "800-555-1212",
                 appointment_date: "2025-01-01",
                 appointment_time: "12:00",
-                people: 0,
+                people: 1,
             }
 
             const response = await request(app)
-                .put(`/appointments/${cancelledAppointmentId}`)
+                .put(`/appointments/${cancelledAppointment.appoinment_id}`)
                 .set("Accept", "application/json")
                 .send({ data })
 
@@ -437,6 +552,13 @@ describe("02 - Read and Update Appointments", () => {
         })
 
         test("returns 400 if people is not a number", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
+
             const data = {
                 first_name: "first",
                 last_name: "last",
@@ -456,6 +578,12 @@ describe("02 - Read and Update Appointments", () => {
         });
 
         test("returns 200 if data is valid", async () => {
+
+            const appoinment = await knex('appointments')
+                .where({ mobile_number: "800-555-1212", status: "booked" })
+                .first()
+                
+            const appointmentURL = `/appointments/${appoinment.appoinment_id}`
 
             const data = {
                 first_name: "first",

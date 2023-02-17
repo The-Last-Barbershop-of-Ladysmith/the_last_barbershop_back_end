@@ -5,6 +5,16 @@
         "mobile_number": "800-555-1212",
         "appointment_date": "2026-12-30",
         "appointment_time": "12:00",
-        "people": 2
+        "people": 2,
+        "status":"booked"
+    }, 
+    {
+        "first_name": "Mouse",
+        "last_name": "Whale",
+        "mobile_number": "800-555-1212",
+        "appointment_date": "2027-01-30",
+        "appointment_time": "12:00",
+        "people": 2,
+        "status":"cancelled"
     }
 ]
