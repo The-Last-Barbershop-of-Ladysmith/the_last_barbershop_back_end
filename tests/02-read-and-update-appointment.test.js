@@ -5,7 +5,7 @@ const knex = require("../src/db/connection");
 
 /** TODO - Add tests to ensure appoinment is not scheduled for a date already booked */
 
-describe("02 - Read and Update Appointments", async () => {
+describe("02 - Read and Update Appointments", () => {
     beforeAll(() => {
         return knex.migrate
             .forceFreeMigrationsLock()
@@ -21,24 +21,6 @@ describe("02 - Read and Update Appointments", async () => {
         return await knex.migrate.rollback(null, true).then(() => knex.destroy());
     });
 
-    //Create new appointment to retrieve id for put and get requests
-    const newAppointment = {
-        first_name: "Mouse",
-        last_name: "Whale",
-        mobile_number: "800-555-1212",
-        appointment_date: "2026-12-30",
-        appointment_time: "12:00",
-        people: 2,
-    }
-
-    const appointment = await knex("appointments")
-        .insert(newAppointment, "*")
-        .then((data) => data[0])
-
-    const newAppointmentId = appointment.appointment_id
-
-    const appointmentURL = `/appointment/${newAppointmentId}`
-
     describe("GET /appointments/:appointment_id", () => {
 
         test("returns 404 for non-existent id", async () => {
@@ -51,6 +33,9 @@ describe("02 - Read and Update Appointments", async () => {
         });
 
         test("returns 200 for existing id", async () => {
+            
+            const appoinment = await knex('appointments').where({mobile_number: "800-555-1212"}).first()
+
             const response = await request(app)
                 .get(appointmentURL)
                 .set("Accept", "application/json")
