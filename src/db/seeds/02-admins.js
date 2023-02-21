@@ -15,6 +15,6 @@ exports.seed = function(knex) {
           ...password
         }
       })
-      return knex("").insert(adminsWithPassword);
+      return knex("admins").insert(adminsWithPassword);
     });
 };
