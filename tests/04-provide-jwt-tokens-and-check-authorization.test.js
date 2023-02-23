@@ -1,11 +1,13 @@
 const request = require("supertest");
+const bcrypt = require('bcrypt')
 
 const app = require("../src/app");
 const knex = require("../src/db/connection");
+const { generateHashedPassword } = require("../src/utils/password-utils");
 
 /** TODO complete test to include all routes that include POST, PUT, and DELETE ENDPOINTS */
 
-describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
+describe("04 - Provide JWT and CSRF Tokens and check authorization", async () => {
 
     beforeAll(() => {
         return knex.migrate
@@ -35,8 +37,13 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
      * 
      *  **/
 
-    describe("GET /csrf", () => {
+    const csrfResponse = await request(app)
+        .get("/csrf")
+        .set("Accept", "application/json")
 
+    const csrfCookie = csrfResponse.cookies('csrfToken')
+
+    describe("GET /csrf", () => {
         test("returns the csrf token", async () => {
             const response = await request(app)
                 .get('/csrf')
@@ -85,7 +92,6 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         })
 
         test("returns 403 if csrf token is not in request headers", async () => {
-
             const csrfResponse = await request(app)
                 .get("/csrf")
                 .set("Accept", "application/json")
@@ -132,7 +138,6 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
             expect(response.status).toBe(403)
             expect(response.body.error).toContain("csrf")
         })
-
         test("returns 201 if POST request is submitted with proper csrf credentials and valid body", async () => {
             const csrfResponse = await request(app)
                 .get("/csrf")
@@ -170,27 +175,34 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         })
     })
 
-    describe("PUT /appointments", () => {
+    describe("PUT /appointments", async () => {
+
+        const newAppointmentData = {
+            first_name: "CsrfToken",
+            last_name: "Test",
+            mobile_number: "999-999-9999",
+            appointment_date: "2025-01-18",
+            appointment_time: "13:30",
+            people: 1,
+        }
+
+        const newAppointment = await knex('appointments')
+            .insert(newAppointmentData, "*")
+            .then((data) => data[0])
+
+        const data = {
+            first_name: "CsrfToken",
+            last_name: "Accepted",
+            mobile_number: "999-999-9999",
+            appointment_date: "2025-01-18",
+            appointment_time: "13:30",
+            people: 1,
+        }
 
         test("returns 403 if hashed csrf token in cookies is not sent with request and csrf token not sent in request headers", async () => {
 
-            const appointment = await knex('appointments')
-                .where({ first_name: "CsrfToken" })
-                .first()
-
-            const putUrl = `/appointments/${appointment.appointment_id}`
-
-            const data = {
-                first_name: "CsrfToken",
-                last_name: "Accepted",
-                mobile_number: "999-999-9999",
-                appointment_date: "2025-01-18",
-                appointment_time: "13:30",
-                people: 1,
-            }
-
             const response = await (app)
-                .put(putUrl)
+                .put(`/appointments/${newAppointment.appointment_id}`)
                 .set("Accept", "application/json")
                 .send(data)
 
@@ -203,23 +215,9 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
                 .get("/csrf")
                 .set("Accept", "application/json")
 
-            const appointment = await knex('appointments')
-                .where({ first_name: "CsrfToken" })
-                .first()
-
-            const putUrl = `/appointments/${appointment.appointment_id}`
-
-            const data = {
-                first_name: "CsrfToken",
-                last_name: "Accepted",
-                mobile_number: "999-999-9999",
-                appointment_date: "2025-01-18",
-                appointment_time: "13:30",
-                people: 1,
-            }
 
             const response = await (app)
-                .put(putUrl)
+                .put(`/appointments/${newAppointment.appointment_id}`)
                 .set("Accept", "application/json")
                 .set('Cookie', [...csrfResponse.headers['set-cookie']])
                 .send(data)
@@ -234,23 +232,9 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
                 .get("/csrf")
                 .set("Accept", "application/json")
 
-            const appointment = await knex('appointments')
-                .where({ first_name: "CsrfToken" })
-                .first()
-
-            const putUrl = `/appointments/${appointment.appointment_id}`
-
-            const data = {
-                first_name: "CsrfToken",
-                last_name: "Accepted",
-                mobile_number: "999-999-9999",
-                appointment_date: "2025-01-18",
-                appointment_time: "13:30",
-                people: 1,
-            }
 
             const response = await (app)
-                .put(putUrl)
+                .put(`/appointments/${newAppointment.appointment_id}`)
                 .set("Accept", "application/json")
                 .set('x-csrf-token', csrfResponse.body.data)
                 .send(data)
@@ -261,28 +245,12 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         })
 
         test("returns 201 if PUT request is submitted with proper csrf credentials and valid body", async () => {
-
             const csrfResponse = await request(app)
                 .get("/csrf")
                 .set("Accept", "application/json")
 
-            const appointment = await knex('appointments')
-                .where({ first_name: "CsrfToken" })
-                .first()
-
-            const putUrl = `/appointments/${appointment.appointment_id}`
-
-            const data = {
-                first_name: "CsrfToken",
-                last_name: "Accepted",
-                mobile_number: "999-999-9999",
-                appointment_date: "2025-01-18",
-                appointment_time: "13:30",
-                people: 1,
-            }
-
             const response = await (app)
-                .put(putUrl)
+                .post('/appointments')
                 .set("Accept", "application/json")
                 .set('x-csrf-token', csrfResponse.body.data)
                 .set('Cookie', csrfResponse.headers['set-cookie'])
@@ -303,15 +271,22 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         })
     })
 
-    describe("POST /users/login", () => {
+    describe("POST /users/login", async () => {
+
+        const newAdmin = {
+            admin_name: "JWT TEST",
+            mobile_number: '777-777-7777',
+            password: generateHashedPassword("admin"),
+            role: "admin"
+        }
+        const { mobile_number, password } = newAdmin
+        await knex('admins').insert({ newAdmin })
+
+        const data = { mobile_number, password: 'admin' }
 
         test("returns 403 if hashed csrf token in cookies is not sent with request and csrf token not sent in request headers", async () => {
 
-            const admin = await knex('admins')
-                .where({ admin_name: "John" })
-                .first()
 
-            const data = { mobile_number: admin.mobile_number, password: process.env.SEED_PASSWORD }
 
             const response = await (app)
                 .post('/users/login')
@@ -323,16 +298,10 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         })
 
         test("returns 403 if csrf token is not in request headers", async () => {
-
             const csrfResponse = await request(app)
                 .get("/csrf")
                 .set("Accept", "application/json")
 
-            const admin = await knex('admins')
-                .where({ admin_name: "John" })
-                .first()
-
-            const data = { mobile_number: admin.mobile_number, password: process.env.SEED_PASSWORD }
 
             const response = await (app)
                 .post('/users/login')
@@ -345,16 +314,9 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         })
 
         test("returns 403 if hashed csrf token in cookies is not sent with request", async () => {
-
             const csrfResponse = await request(app)
                 .get("/csrf")
                 .set("Accept", "application/json")
-
-            const admin = await knex('admins')
-                .where({ admin_name: "John" })
-                .first()
-
-            const data = { mobile_number: admin.mobile_number, password: process.env.SEED_PASSWORD }
 
             const response = await (app)
                 .post('/users/login')
@@ -377,16 +339,9 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
          * (tests for admin routes and duties will be specified on test 5,6,7,and 9)
          */
         test('return 200 for VALID POST request with valid CSRF token and sends user a JSON Web Token and userId in the cookies', async () => {
-
             const csrfResponse = await request(app)
                 .get("/csrf")
                 .set("Accept", "application/json")
-
-            const admin = await knex('admins')
-                .where({ admin_name: "John" })
-                .first()
-
-            const data = { mobile_number: admin.mobile_number, password: process.env.SEED_PASSWORD }
 
             const response = await (app)
                 .post('/appointments')
@@ -396,8 +351,14 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
                 .send(data)
 
             expect(response.body.error).toBeUndefined();
-            expect(response.body.data).toEqual(admin);
-            
+            expect(response.body.data).toEqual(
+                expect.objectContaining({
+                    admin_name: "JWT TEST",
+                    mobile_number: '777-777-7777',
+                    password: generateHashedPassword("admin"),
+                    role: "admin"
+                })
+            );
             /** Read response header of Set-Cookie to see if it includes a given text property */
             const cookieHasProperty = (property) => {
                 return response.headers['set-cookie'][0].includes(property)
