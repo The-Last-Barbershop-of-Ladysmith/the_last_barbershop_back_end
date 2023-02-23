@@ -16,5 +16,13 @@
         "appointment_time": "12:00",
         "people": 2,
         "status":"cancelled"
+    },
+    {
+        "first_name": "CsrfToken",
+        "last_name": "Test",
+        "mobile_number": "999-999-9999",
+        "appointment_date": "2025-01-18",
+        "appointment_time": "13:30",
+        "people": 1
     }
 ]
