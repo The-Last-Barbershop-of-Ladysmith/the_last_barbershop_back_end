@@ -3,7 +3,7 @@ const request = require("supertest");
 const app = require("../src/app");
 const knex = require("../src/db/connection");
 
-/** TODO - Add tests to ensure appoinment is not scheduled for a date and time already booked 
+/** TODO - Add tests to ensure appointment is not scheduled for a date and time already booked 
  * Create List Appointment tests
 */
 

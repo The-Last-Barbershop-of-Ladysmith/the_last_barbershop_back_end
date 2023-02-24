@@ -7,6 +7,7 @@ const {
 } = require("../src/utils/password-utils");
 
 describe("01 - Create Read and Update Admins", () => {
+    
   /**Admins table will have the following structure
    * admin_id - uuid - primary key
    * admin_name - string - name admin would like to go by
