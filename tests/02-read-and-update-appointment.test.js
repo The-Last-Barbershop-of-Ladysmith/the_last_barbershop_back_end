@@ -5,6 +5,12 @@ const knex = require("../src/db/connection");
 
 /** TODO - Add tests to ensure appointment is not scheduled for a date already booked */
 
+/** CSRF protection does not yet need to be implemented for test to pass
+ * app requests will be built to conditionally set csrf cookie and auth header if GET route /csrf returns the tokens
+ * All PUT, POST, DELETE requests will need to use CSRF protection once implemented
+ * Test for correct implementation of CSRF token will be handled on test 4
+ */
+
 describe("02 - Read and Update Appointments", () => {
   beforeAll(() => {
     return knex.migrate
@@ -32,10 +38,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 200 for existing id", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const response = await request(app)
@@ -58,6 +60,18 @@ describe("02 - Read and Update Appointments", () => {
   });
 
   describe("PUT /appointments/:appointment_id", async () => {
+    let appointment;
+    let csrfResponse;
+
+    beforeEach(async () => {
+      appointment = await knex("appointments")
+        .where({ mobile_number: "800-555-1212", status: "booked" })
+        .first();
+      csrfResponse = await request(app)
+        .get("/csrf")
+        .set("Accept", "application/json");
+    });
+
     test("returns 404 if appointment_id is non-existent", async () => {
       const data = {
         first_name: "Mouse",
@@ -71,6 +85,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put("/appointment/99")
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("99");
@@ -78,15 +94,13 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if data missing", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ datum: {} });
 
       expect(response.body.error).toBeUndefined();
@@ -94,10 +108,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if first_name is missing", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -107,9 +117,12 @@ describe("02 - Read and Update Appointments", () => {
         appointment_time: "12:00",
         people: 2,
       };
+
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("first_name");
@@ -117,10 +130,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if first_name is empty", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -131,9 +140,12 @@ describe("02 - Read and Update Appointments", () => {
         appointment_time: "12:00",
         people: 2,
       };
+
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("first_name");
@@ -141,10 +153,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if last_name is missing", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -158,6 +166,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("last_name");
@@ -165,10 +175,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if last_name is empty", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -183,6 +189,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("last_name");
@@ -190,10 +198,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if mobile_number is missing", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -203,9 +207,12 @@ describe("02 - Read and Update Appointments", () => {
         appointment_time: "12:00",
         people: 2,
       };
+
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("mobile_number");
@@ -213,10 +220,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if mobile_number is empty", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
       const data = {
         first_name: "Mouse",
@@ -226,9 +229,12 @@ describe("02 - Read and Update Appointments", () => {
         appointment_time: "12:00",
         people: 2,
       };
+
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("mobile_number");
@@ -236,9 +242,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if mobile_number is not a string matching format ^d{3}-d{3}-d{4}$", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -253,6 +256,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("mobile_number");
@@ -260,10 +265,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if mobile_number is not a string of numbers", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -278,6 +279,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("mobile_number");
@@ -285,10 +288,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if mobile_number is not a string not length of 10", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -303,6 +302,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("mobile_number");
@@ -310,10 +311,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if appointment_date is missing", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -327,6 +324,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("appointment_date");
@@ -334,10 +333,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if appointment_date is empty", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -352,6 +347,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("appointment_date");
@@ -359,10 +356,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if appointment_date is not a date in format YYYY-MM-DD", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -377,6 +370,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("appointment_date");
@@ -384,10 +379,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if appointment_time is missing", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -401,6 +392,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("appointment_time");
@@ -408,11 +401,8 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if appointment_time is empty", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
+
       const data = {
         first_name: "Mouse",
         last_name: "Whale",
@@ -425,6 +415,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("appointment_time");
@@ -432,10 +424,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if appointment_time is not a time format HH:MM", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -450,6 +438,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("appointment_time");
@@ -457,10 +447,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if people is missing", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -474,6 +460,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("people");
@@ -481,10 +469,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if people is less than 1", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -499,6 +483,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("people");
@@ -522,6 +508,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(`/appointments/${cancelledAppointment.appointment_id}`)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("status");
@@ -529,10 +517,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 400 if people is not a number", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -547,6 +531,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toContain("people");
@@ -554,10 +540,6 @@ describe("02 - Read and Update Appointments", () => {
     });
 
     test("returns 200 if data is valid", async () => {
-      const appointment = await knex("appointments")
-        .where({ mobile_number: "800-555-1212", status: "booked" })
-        .first();
-
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -572,6 +554,8 @@ describe("02 - Read and Update Appointments", () => {
       const response = await request(app)
         .put(appointmentURL)
         .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
       expect(response.body.error).toBeUndefined();
