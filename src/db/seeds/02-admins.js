@@ -1,20 +1,22 @@
 const admins = require("./02-admins.json");
+const { generateHashedPassword } = require("../../utils/password-utils");
 
-const {generateHashedPassword} = require('../../utils/password-utils')
+/** Create array of user objects including a hashed password
+ * @returns {<Promise> {admin_name: string, mobile_number: String, role:string, password:string }[]} 
+ */
+const getAdminsWithPassword = async () => {
+  const password = await generateHashedPassword(process.env.SEED_PASSWORD);
+  return users.map((user) => (user = { ...user, password }));
+};
 
-exports.seed = function(knex) {
-  // Deletes ALL existing entries
-  return knex
-    .raw("TRUNCATE TABLE admins RESTART IDENTITY CASCADE")
-    .then(function () {
-      // Add hashed password for each Admin
-      const adminsWithPassword = admins.forEach((admin)=>{
-        const password = generateHashedPassword(process.env.SEED_PASSWORD)
-        return {
-          admin, 
-          ...password
-        }
-      })
-      return knex("admins").insert(adminsWithPassword);
-    });
+exports.seed = (knex) => {
+  return (
+    // Deletes ALL existing entries
+    knex
+      .raw("TRUNCATE TABLE users RESTART IDENTITY CASCADE")
+      // Generate array of users with hashed password
+      .then(getAdminsWithPassword)
+      // Insert seed entries
+      .then((data) => knex("admins").insert(data))
+  );
 };
