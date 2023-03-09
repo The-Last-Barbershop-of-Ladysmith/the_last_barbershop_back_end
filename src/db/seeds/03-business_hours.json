@@ -1,0 +1,58 @@
+[
+    {
+        "day": "Sunday",
+        "day_value": 0,
+        "open_time": "12:00",
+        "close_time": "16:00", 
+        "lunch_start": "13:00", 
+        "lunch_end": "14:00"
+    },
+    {
+        "day": "Monday",
+        "day_value": 1,
+        "open_time": "10:00",
+        "close_time": "17:00", 
+        "lunch_start": "13:00", 
+        "lunch_end": "14:00"
+    }, 
+    {
+        "day": "Tuesday",
+        "day_value": 2,
+        "open_time": "10:00",
+        "close_time": "17:00", 
+        "lunch_start": "13:00", 
+        "lunch_end": "14:00"
+    }, 
+    {
+        "day": "Wednesday",
+        "day_value": 3,
+        "open_time": "10:00",
+        "close_time": "17:00", 
+        "lunch_start": "13:00", 
+        "lunch_end": "14:00"
+    }, 
+    {
+        "day": "Thursday",
+        "day_value": 4,
+        "open_time": "10:00",
+        "close_time": "17:00", 
+        "lunch_start": "13:00", 
+        "lunch_end": "14:00"
+    }, 
+    {
+        "day": "Friday",
+        "day_value": 5,
+        "open_time": "10:00",
+        "close_time": "17:00", 
+        "lunch_start": "13:00", 
+        "lunch_end": "14:00"
+    }, 
+    {
+        "day": "Saturday",
+        "day_value": 6,
+        "open_time": "10:00",
+        "close_time": "16:00", 
+        "lunch_start": "13:00", 
+        "lunch_end": "14:00"
+    }
+]

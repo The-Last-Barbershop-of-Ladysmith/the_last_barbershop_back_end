@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("../src/app");
 const knex = require("../src/db/connection");
+const { formatDateObjAsDateString, formatDateObjAsTimeString } = require('./utils/date-time')
 
 /** CSRF protection does not yet need to be implemented for test to pass
  * app requests will be built to conditionally set csrf cookie and auth header if GET route /csrf returns the tokens
@@ -14,95 +15,165 @@ const knex = require("../src/db/connection");
 jest.useFakeTimers("modern");
 
 describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
-  let csrfResponse;
-  const RealDate = Date.now;
+    let csrfResponse;
+    let businessDay
+    const RealDate = Date.now;
 
-  beforeAll(() => {
-    // Set system time for test to be 3/7/2023 10:00 AM
-    jest.setSystemTime(new Date("2023-03-07T10:00:00Z").getTime());
-    return knex.migrate
-      .forceFreeMigrationsLock()
-      .then(() => knex.migrate.rollback(null, true))
-      .then(() => knex.migrate.latest());
-  });
-
-  beforeEach(async () => {
-    await knex.seed.run();
-    csrfResponse = await request(app)
-      .get("/csrf")
-      .set("Accept", "application/json");
-  });
-
-  afterAll(async () => {
-    // Return to real time
-    jest.useRealTimers();
-    return await knex.migrate.rollback(null, true).then(() => knex.destroy());
-  });
-
-  describe("POST /appointments", () => {
-    test("returns 400 for appointment scheduled for a date in the past", async () => {
-      const data = {
-        first_name: "first",
-        last_name: "last",
-        mobile_number: "800-555-1212",
-        appointment_date: "1989-01-01",
-        appointment_time: "12:00",
-        people: 2,
-      };
-
-      const response = await request(app)
-        .post("/appointments")
-        .set("Accept", "application/json")
-        .set("x-csrf-token", csrfResponse.body.data || null)
-        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
-        .send({ data });
-
-      expect(response.status).toBe(400);
-      expect(response.body.error).toContain("future");
+    beforeAll(() => {
+        // Set system time for test to be 3/7/2023 10:00 AM
+        jest.setSystemTime(new Date("2023-03-07T10:00:00").getTime());
+        return knex.migrate
+            .forceFreeMigrationsLock()
+            .then(() => knex.migrate.rollback(null, true))
+            .then(() => knex.migrate.latest());
     });
 
-    test("returns 400 for appointment scheduled less than 1 hour in advance", async () => {
-      // Create date object of 30 min past system time
-      const scheduleDate = new Date("2023-03-07T10:30:00Z");
-      // Get date formatted in string that matches PostgreSQL format
-      const appointmentDate = scheduleDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
-      // Get time formatted in string that matches PostgreSQL format
-      const appointmentTime = scheduleDate.toLocaleTimeString("en-US", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      const data = {
-        first_name: "first",
-        last_name: "last",
-        mobile_number: "800-555-1212",
-        appointment_date: appointmentDate,
-        appointment_time: appointmentTime,
-        people: 1,
-      };
-
-      const response = await request(app)
-        .post("/appointments")
-        .set("Accept", "application/json")
-        .set("x-csrf-token", csrfResponse.body.data || null)
-        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
-        .send({ data });
-
-      expect(response.status).toBe(400);
-      expect(response.body.error).toContain("future");
+    beforeEach(async () => {
+        await knex.seed.run();
+        // Get the businessDay info for the next day 
+        businessDay = await knex('business_days').where("day_value", new Date("2023-03-07T10:00:00").getDay()).first()
+        csrfResponse = await request(app)
+            .get("/csrf")
+            .set("Accept", "application/json");
     });
 
-    test("Returns 400 for appointment scheduled before shop opens", async () => {});
+    afterAll(async () => {
+        // Return to real time
+        jest.useRealTimers();
+        return await knex.migrate.rollback(null, true).then(() => knex.destroy());
+    });
 
-    test("Returns 400 for appointment scheduled less than 30 min before shop closes", async () => {});
+    describe("POST /appointments", () => {
+        test("returns 400 for appointment scheduled for a date in the past", async () => {
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "1989-01-01",
+                appointment_time: "12:00",
+                people: 2,
+            };
 
-    test("Returns 400 for appointment scheduled during a lunch break", async () => {});
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
 
-    test("Returns 400 for appointment scheduled on a date that is blocked", async () => {});
-  });
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("future");
+        });
+
+        test("returns 400 for appointment scheduled less than 1 hour in advance", async () => {
+
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2023-03-07",
+                appointment_time: "10:30",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("future");
+        });
+
+        test("Returns 400 for appointment scheduled before shop opens", async () => {
+
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2023-03-08",
+                appointment_time: "09:30",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("open");
+        });
+
+        test("Returns 400 for appointment scheduled after shop closes", async () => {
+
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2023-03-08",
+                appointment_time: "5:45",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("closed");
+        });
+
+        test("Returns 400 for appointment scheduled less than 30 min before shop closes", async () => {
+
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2023-03-08",
+                appointment_time: "04:45",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("closes");
+        });
+
+        test("Returns 400 for appointment scheduled during a lunch break", async () => {
+
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2023-03-08",
+                appointment_time: "01:30",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+        });
+
+        test("Returns 400 for appointment scheduled on a date that is blocked", async () => { });
+    });
 });
