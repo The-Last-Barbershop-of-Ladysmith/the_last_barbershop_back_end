@@ -1,12 +1,10 @@
 const admins = require("./02-admins.json");
 const { generateHashedPassword } = require("../../utils/password-utils");
 
-/** Create array of user objects including a hashed password
- * @returns {<Promise> {admin_name: string, mobile_number: String, role:string, password:string }[]} 
- */
+/** Create array of user objects including a hashed password */
 const getAdminsWithPassword = async () => {
   const password = await generateHashedPassword(process.env.SEED_PASSWORD);
-  return users.map((user) => (user = { ...user, password }));
+  return admins.map((admin) => (admin = { ...admin, password }));
 };
 
 exports.seed = (knex) => {

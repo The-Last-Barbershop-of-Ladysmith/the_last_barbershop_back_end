@@ -4,7 +4,7 @@
         "last_name": "Whale",
         "mobile_number": "800-555-1212",
         "appointment_date": "2026-12-30",
-        "appointment_time": "12:00",
+        "start_time": "12:00",
         "people": 2,
         "status":"booked"
     }, 
@@ -13,7 +13,7 @@
         "last_name": "Whale",
         "mobile_number": "800-555-1212",
         "appointment_date": "2027-01-30",
-        "appointment_time": "12:00",
+        "start_time": "12:00",
         "people": 2,
         "status":"cancelled"
     },
@@ -22,7 +22,7 @@
         "last_name": "Test",
         "mobile_number": "999-999-9999",
         "appointment_date": "2025-01-18",
-        "appointment_time": "13:30",
+        "start_time": "13:30",
         "people": 1
     }
 ]

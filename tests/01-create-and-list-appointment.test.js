@@ -68,7 +68,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -89,7 +89,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -109,7 +109,7 @@ describe("01 - Create and List Appointments", () => {
         first_name: "first",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -130,7 +130,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -150,7 +150,7 @@ describe("01 - Create and List Appointments", () => {
         first_name: "first",
         last_name: "last",
         appointment_date: "2025-01-01",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -171,7 +171,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "",
         appointment_date: "2025-01-01",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -192,7 +192,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "Whale",
         mobile_number: "1234567890",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -212,7 +212,7 @@ describe("01 - Create and List Appointments", () => {
         first_name: "first",
         last_name: "last",
         mobile_number: "800-555-1212",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -233,7 +233,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -254,7 +254,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "not-a-date",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -269,7 +269,7 @@ describe("01 - Create and List Appointments", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if appointment_time is missing", async () => {
+    test("returns 400 if start_time is missing", async () => {
       const data = {
         first_name: "first",
         last_name: "last",
@@ -285,17 +285,17 @@ describe("01 - Create and List Appointments", () => {
         .set("Cookie", csrfResponse.headers["set-cookie"]||null)
         .send({ data });
 
-      expect(response.body.error).toContain("appointment_time");
+      expect(response.body.error).toContain("start_time");
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if appointment_time is empty", async () => {
+    test("returns 400 if start_time is empty", async () => {
       const data = {
         first_name: "first",
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "",
+        start_time: "",
         people: 1,
       };
 
@@ -306,17 +306,17 @@ describe("01 - Create and List Appointments", () => {
         .set("Cookie", csrfResponse.headers["set-cookie"]||null)
         .send({ data });
 
-      expect(response.body.error).toContain("appointment_time");
+      expect(response.body.error).toContain("start_time");
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if appointment_time is not a time in format HH:MM", async () => {
+    test("returns 400 if start_time is not a time in format HH:MM", async () => {
       const data = {
         first_name: "first",
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "not-a-time",
+        start_time: "not-a-time",
         people: 1,
       };
 
@@ -328,7 +328,7 @@ describe("01 - Create and List Appointments", () => {
         .send({ data });
 
       expect(response.status).toBe(400);
-      expect(response.body.error).toContain("appointment_time");
+      expect(response.body.error).toContain("start_time");
     });
 
     test("returns 400 if people is missing", async () => {
@@ -337,7 +337,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "17:30",
+        start_time: "17:30",
       };
 
       const response = await request(app)
@@ -357,7 +357,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "17:30",
+        start_time: "17:30",
         people: 0,
       };
 
@@ -378,7 +378,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "17:30",
+        start_time: "17:30",
         people: "2",
       };
 
@@ -399,7 +399,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "17:30",
+        start_time: "17:30",
         people: 2,
       };
 
@@ -417,7 +417,7 @@ describe("01 - Create and List Appointments", () => {
           last_name: "last",
           mobile_number: "800-555-1212",
           appointment_date: expect.stringContaining("2025-01-01"),
-          appointment_time: expect.stringContaining("17:30"),
+          start_time: expect.stringContaining("17:30"),
           people: 2,
         })
       );
@@ -430,7 +430,7 @@ describe("01 - Create and List Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "17:30",
+        start_time: "17:30",
         people: 2,
       };
 
@@ -443,6 +443,28 @@ describe("01 - Create and List Appointments", () => {
 
       expect(response.body.error).toBeUndefined();
       expect(response.body.data.status).toEqual("booked");
+      expect(response.status).toBe(201);
+    });
+
+    test("updates appointment end_time an additional 30 minutes for each person after the start time", async () => {
+      const data = {
+        first_name: "first",
+        last_name: "last",
+        mobile_number: "800-555-1212",
+        appointment_date: "2025-01-01",
+        start_time: "17:30",
+        people: 2,
+      };
+
+      const response = await request(app)
+        .post("/appointments")
+        .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data||null)
+        .set("Cookie", csrfResponse.headers["set-cookie"]||null)
+        .send({ data });
+
+      expect(response.body.error).toBeUndefined();
+      expect(response.body.data[end_time]).toEqual("18:30");
       expect(response.status).toBe(201);
     });
   });

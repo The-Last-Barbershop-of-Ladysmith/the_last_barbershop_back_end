@@ -50,7 +50,7 @@ describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
                 last_name: "last",
                 mobile_number: "800-555-1212",
                 appointment_date: "1989-01-01",
-                appointment_time: "12:00",
+                start_time: "12:00",
                 people: 2,
             };
 
@@ -72,7 +72,7 @@ describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
                 last_name: "last",
                 mobile_number: "800-555-1212",
                 appointment_date: "2023-03-07",
-                appointment_time: "10:30",
+                start_time: "10:30",
                 people: 1,
             };
 
@@ -94,7 +94,7 @@ describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
                 last_name: "last",
                 mobile_number: "800-555-1212",
                 appointment_date: "2023-03-08",
-                appointment_time: "09:30",
+                start_time: "09:30",
                 people: 1,
             };
 
@@ -116,7 +116,7 @@ describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
                 last_name: "last",
                 mobile_number: "800-555-1212",
                 appointment_date: "2023-03-08",
-                appointment_time: "5:45",
+                start_time: "5:30",
                 people: 1,
             };
 
@@ -138,7 +138,7 @@ describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
                 last_name: "last",
                 mobile_number: "800-555-1212",
                 appointment_date: "2023-03-08",
-                appointment_time: "04:45",
+                start_time: "04:30",
                 people: 1,
             };
 
@@ -160,7 +160,7 @@ describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
                 last_name: "last",
                 mobile_number: "800-555-1212",
                 appointment_date: "2023-03-08",
-                appointment_time: "01:30",
+                start_time: "01:30",
                 people: 1,
             };
 
@@ -174,6 +174,66 @@ describe("03 - Appointments Are Made Within An Eligible Time frame", () => {
             expect(response.status).toBe(400);
         });
 
-        test("Returns 400 for appointment scheduled on a date that is blocked", async () => { });
+        test("Returns 400 for appointment scheduled on a date that is blocked", async () => { 
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2023-03-10",
+                start_time: "02:30",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("unavailable");
+        });
+        test("Returns 400 for appointment not scheduled on 30 min intervals", async ()=>{
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2023-03-10",
+                start_time: "02:45",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("30");
+        })
+        test("Returns 400 for appointment scheduled on time slot already booked", async () =>{
+            const data = {
+                first_name: "first",
+                last_name: "last",
+                mobile_number: "800-555-1212",
+                appointment_date: "2026-12-30",
+                start_time: "12:00",
+                people: 1,
+            };
+
+            const response = await request(app)
+                .post("/appointments")
+                .set("Accept", "application/json")
+                .set("x-csrf-token", csrfResponse.body.data || null)
+                .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+                .send({ data });
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toContain("unavailable");
+        })
+        test("Returns 400 for appointmen scheduled while another appointment is to be in progress")
     });
 });

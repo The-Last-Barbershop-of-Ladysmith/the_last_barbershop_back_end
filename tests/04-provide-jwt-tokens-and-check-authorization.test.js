@@ -73,7 +73,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-15",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -92,7 +92,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-15",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -112,7 +112,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-15",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -132,7 +132,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-15",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -151,7 +151,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
           last_name: "last",
           mobile_number: "800-555-1212",
           appointment_date: expect.stringContaining("2025-01-15"),
-          appointment_time: expect.stringContaining("17:30"),
+          start_time: expect.stringContaining("17:30"),
           people: 2,
         })
       );
@@ -173,7 +173,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "Accepted",
         mobile_number: "999-999-9999",
         appointment_date: "2025-01-18",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -192,7 +192,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "Accepted",
         mobile_number: "999-999-9999",
         appointment_date: "2025-01-18",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -212,7 +212,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "Accepted",
         mobile_number: "999-999-9999",
         appointment_date: "2025-01-18",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -232,7 +232,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
         last_name: "Accepted",
         mobile_number: "999-999-9999",
         appointment_date: "2025-01-18",
-        appointment_time: "13:30",
+        start_time: "13:30",
         people: 1,
       };
 
@@ -251,7 +251,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
           last_name: "Accepted",
           mobile_number: "999-999-9999",
           appointment_date: expect.stringContaining("2025-01-18"),
-          appointment_time: expect.stringContaining("13:30"),
+          start_time: expect.stringContaining("13:30"),
           people: 1,
         })
       );

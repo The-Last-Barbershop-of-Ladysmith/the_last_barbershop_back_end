@@ -52,7 +52,7 @@ describe("02 - Read and Update Appointments", () => {
           last_name: "Whale",
           mobile_number: "800-555-1212",
           appointment_date: expect.stringContaining("2026-12-30"),
-          appointment_time: expect.stringContaining("12:00"),
+          start_time: expect.stringContaining("12:00"),
           people: 2,
         })
       );
@@ -78,7 +78,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "800-555-1212",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -114,7 +114,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "800-555-1212",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -137,7 +137,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "800-555-1212",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -159,7 +159,7 @@ describe("02 - Read and Update Appointments", () => {
         first_name: "Mouse",
         mobile_number: "800-555-1212",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -182,7 +182,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "",
         mobile_number: "800-555-1212",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -204,7 +204,7 @@ describe("02 - Read and Update Appointments", () => {
         first_name: "Mouse",
         last_name: "Whale",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -226,7 +226,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -249,7 +249,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "1234567890",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -272,7 +272,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "abcdefghij",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -295,7 +295,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "123456",
         appointment_date: "2026-12-30",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -317,7 +317,7 @@ describe("02 - Read and Update Appointments", () => {
         first_name: "Mouse",
         last_name: "Whale",
         mobile_number: "1234567890",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -340,7 +340,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "1234567890",
         appointment_date: "",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -363,7 +363,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "1234567890",
         appointment_date: "not-a-date",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -378,7 +378,7 @@ describe("02 - Read and Update Appointments", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if appointment_time is missing", async () => {
+    test("returns 400 if start_time is missing", async () => {
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -396,11 +396,11 @@ describe("02 - Read and Update Appointments", () => {
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
-      expect(response.body.error).toContain("appointment_time");
+      expect(response.body.error).toContain("start_time");
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if appointment_time is empty", async () => {
+    test("returns 400 if start_time is empty", async () => {
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -408,7 +408,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "1234567890",
         appointment_date: "2026-12-30",
-        appointment_time: "",
+        start_time: "",
         people: 2,
       };
 
@@ -419,11 +419,11 @@ describe("02 - Read and Update Appointments", () => {
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
-      expect(response.body.error).toContain("appointment_time");
+      expect(response.body.error).toContain("start_time");
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if appointment_time is not a time format HH:MM", async () => {
+    test("returns 400 if start_time is not a time format HH:MM", async () => {
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
@@ -431,7 +431,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "Whale",
         mobile_number: "1234567890",
         appointment_date: "2026-12-30",
-        appointment_time: "not-a-time",
+        start_time: "not-a-time",
         people: 2,
       };
 
@@ -442,7 +442,7 @@ describe("02 - Read and Update Appointments", () => {
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
-      expect(response.body.error).toContain("appointment_time");
+      expect(response.body.error).toContain("start_time");
       expect(response.status).toBe(400);
     });
 
@@ -454,7 +454,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "12:00",
+        start_time: "12:00",
       };
 
       const response = await request(app)
@@ -476,7 +476,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 0,
       };
 
@@ -501,7 +501,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 1,
       };
 
@@ -524,7 +524,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: "2",
       };
 
@@ -539,6 +539,30 @@ describe("02 - Read and Update Appointments", () => {
       expect(response.status).toBe(400);
     });
 
+    test("updates appointment end_time an additional 30 minutes for each person after the start time", async () => {
+      const appointmentURL = `/appointments/${appointment.appointment_id}`;
+
+      const data = {
+        first_name: "first",
+        last_name: "last",
+        mobile_number: "800-555-1212",
+        appointment_date: "2025-01-01",
+        start_time: "12:00",
+        people: "2",
+      };
+
+      const response = await request(app)
+        .put(appointmentURL)
+        .set("Accept", "application/json")
+        .set("x-csrf-token", csrfResponse.body.data || null)
+        .set("Cookie", csrfResponse.headers["set-cookie"] || null)
+        .send({ data });
+
+      expect(response.body.error).toBeUndefined();
+      expect(response.body.data[end_time]).toEqual("01:00");
+      expect(response.status).toBe(201);
+    });
+
     test("returns 200 if data is valid", async () => {
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
@@ -547,7 +571,7 @@ describe("02 - Read and Update Appointments", () => {
         last_name: "last",
         mobile_number: "800-555-1212",
         appointment_date: "2025-01-01",
-        appointment_time: "12:00",
+        start_time: "12:00",
         people: 2,
       };
 
@@ -565,7 +589,7 @@ describe("02 - Read and Update Appointments", () => {
           last_name: "last",
           mobile_number: "800-555-1212",
           appointment_date: expect.stringContaining("2025-01-01"),
-          appointment_time: expect.stringContaining("12:00"),
+          start_time: expect.stringContaining("12:00"),
           people: 2,
         })
       );
