@@ -1,15 +1,23 @@
 const path = require('path');
 require('dotenv').config();
 
+const {
+  DATABASE_URL_DEVELOPMENT, 
+  DB_TEST, 
+  DB_DEV, 
+  DB_PASSWORD, 
+  DB_USER
+} = process.env;
+
 module.exports = {
 
   development: {
     client: 'postgresql',
     connection: {
       host : 'localhost',
-      user : process.env.DB_USER,
-      password : process.env.DB_PASSWORD,
-      database : process.env.DB_DEV
+      user : DB_USER,
+      password : DB_PASSWORD,
+      database : DB_DEV
     },
     migrations: {
       directory: path.join(__dirname, 'src', 'db', 'migrations'),
@@ -23,9 +31,9 @@ module.exports = {
     client: 'postgresql',
     connection: {
       host : 'localhost',
-      user : process.env.DB_USER,
-      password : process.env.DB_PASSWORD,
-      database : process.env.DB_TEST
+      user : DB_USER,
+      password : DB_PASSWORD,
+      database : DB_TEST
     },
     migrations: {
       directory: path.join(__dirname, 'src', 'db', 'migrations'),

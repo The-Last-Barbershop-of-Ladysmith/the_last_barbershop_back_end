@@ -3,13 +3,15 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-  return knex.schema.createTable("reservations", (table) => {
-    table.increments("reservation_id").primary();
+  return knex.schema.createTable("appointments", (table) => {
+    table.increments("appointment_id").primary();
     table.string("first_name").notNullable();
     table.string("last_name").notNullable();
     table.string("mobile_number").notNullable();
-    table.string("reservation_date").notNullable();
-    table.time("reservation_time").notNullable();
+    table.string("appointment_date").notNullable();
+    table.time("appointment_time").notNullable();
+    table.integer("people").notNullable();
+    table.string("status").notNullable();
     table.timestamps(true, true);
   });
 };
@@ -19,5 +21,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-  return knex.schema.dropTable('reservations');
+  return knex.schema.dropTable('appointments');
 };
