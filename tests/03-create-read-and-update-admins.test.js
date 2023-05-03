@@ -6,13 +6,13 @@ const {
   validPassword,
 } = require("../src/utils/password-utils");
 
-describe("01 - Create Read and Update Admins", () => {
-  /**Admins table will have the following structure
-   * admin_id - uuid - primary key
-   * admin_name - string - name admin would like to go by
-   * mobile_number - string - pattern [^\d{3}-\d{3}-\d{4}$] - admin contact number that will be used as login "username"
+describe("01 - Create Read and Update users", () => {
+  /**users table will have the following structure
+   * user_id - uuid - primary key
+   * user_name - string - name user would like to go by
+   * mobile_number - string - pattern [^\d{3}-\d{3}-\d{4}$] - user contact number that will be used as login "username"
    * password - string - login password.  hashed password will be saved in db
-   * role - string - current role of admin.  Should be admin or terminated
+   * role - string - current role of user.  Should be user or terminated
    */
 
   /** CSRF protection does not yet need to be implemented for test to pass
@@ -36,7 +36,7 @@ describe("01 - Create Read and Update Admins", () => {
     return await knex.migrate.rollback(null, true).then(() => knex.destroy());
   });
 
-  describe("POST /admins", () => {
+  describe("POST /users", () => {
     let csrfResponse;
 
     beforeEach(async () => {
@@ -47,7 +47,7 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if data is missing", async () => {
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -57,26 +57,26 @@ describe("01 - Create Read and Update Admins", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if admin_name is empty", async () => {
+    test("returns 400 if user_name is empty", async () => {
       const data = {
-        admin_name: "",
+        user_name: "",
         mobile_number: "123-456-7890",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
-      expect(response.body.error).toContain("admin_name");
+      expect(response.body.error).toContain("user_name");
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if admin_name is missing", async () => {
+    test("returns 400 if user_name is missing", async () => {
       const data = {
         mobile_number: "123-456-7890",
         password: "test",
@@ -84,26 +84,26 @@ describe("01 - Create Read and Update Admins", () => {
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
-      expect(response.body.error).toContain("admin_name");
+      expect(response.body.error).toContain("user_name");
       expect(response.status).toBe(400);
     });
 
     test("returns 400 if mobile_number is empty", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -115,13 +115,13 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if mobile_number is missing", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -133,14 +133,14 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if mobile number is not in format [^d{3}-d{3}-d{4}$]", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "1234567890",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -152,14 +152,14 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if admin already exists with phone number", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "855-000-0000",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -171,14 +171,14 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if password is empty", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "123-456-7890",
         password: "",
         role: "admin",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -190,13 +190,13 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if password is missing", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "123-456-7890",
         role: "admin",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -208,13 +208,13 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if role is empty", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "123-456-7890",
         password: "test",
         role: "",
       };
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -226,12 +226,12 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if role is missing", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "123-456-7890",
         password: "test",
       };
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -243,14 +243,14 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 201 if data is valid with newly created admin that has hashed password ", async () => {
       const data = {
-        admin_name: "John T",
+        user_name: "John T",
         mobile_number: "123-456-7890",
         password: "test",
-        role: "admin",
+        role: "user",
       };
 
       const response = await request(app)
-        .post("/admins")
+        .post("/users")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -266,7 +266,7 @@ describe("01 - Create Read and Update Admins", () => {
       expect(response.body.error).toBeUndefined();
       expect(response.body.data).toEqual(
         expect.objectContaining({
-          admin_name: "John T",
+          user_name: "John T",
           mobile_number: "123-456-7890",
           role: "admin",
         })
@@ -276,10 +276,10 @@ describe("01 - Create Read and Update Admins", () => {
     });
   });
 
-  describe("GET /admins/:admin_id", () => {
-    test("returns 404 for non-existent admin_id", async () => {
+  describe("GET /users/:user_id", () => {
+    test("returns 404 for non-existent user_id", async () => {
       const response = await request(app)
-        .get("/admins/99")
+        .get("/users/99")
         .set("Accept", "application/json");
 
       expect(response.body.error).toContain("99");
@@ -287,34 +287,34 @@ describe("01 - Create Read and Update Admins", () => {
     });
 
     test("returns 200 for existing id", async () => {
-      const admin = await knex("admins").where({ admin_name: "John" }).first();
+      const user = await knex("users").where({ user_name: "John" }).first();
 
       const response = await request(app)
-        .get(`/admins/${admin.admin_id}`)
+        .get(`/users/${user.user_id}`)
         .set("Accept", "application/json");
 
       expect(response.body.error).toBeUndefined();
       expect(response.status).toBe(200);
-      expect(response.body.data).toEqual(admin);
+      expect(response.body.data).toEqual(user);
     });
   });
 
-  describe("PUT /admins/:admin_id", () => {
+  describe("PUT /users/:user_id", () => {
     let csrfResponse;
-    let adminId;
+    let userId;
 
     beforeEach(async () => {
       csrfResponse = await request(app)
         .get("/csrf")
         .set("Accept", "application/json");
-      adminId = await knex("admins")
-        .where({ admin_name: "John" })
-        .first("admin_id");
+      userId = await knex("users")
+        .where({ user_name: "John" })
+        .first("user_id");
     });
 
-    test("returns 404 for non-existent admin_id", async () => {
+    test("returns 404 for non-existent user_id", async () => {
       const response = await request(app)
-        .put("/admins/99")
+        .put("/users/99")
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -336,26 +336,26 @@ describe("01 - Create Read and Update Admins", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if admin_name is empty", async () => {
+    test("returns 400 if user_name is empty", async () => {
       const data = {
-        admin_name: "",
+        user_name: "",
         mobile_number: "855-000-0000",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
-      expect(response.body.error).toContain("admin_name");
+      expect(response.body.error).toContain("user_name");
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if admin_name is missing", async () => {
+    test("returns 400 if user_name is missing", async () => {
       const data = {
         mobile_number: "855-000-0000",
         password: "test",
@@ -363,26 +363,26 @@ describe("01 - Create Read and Update Admins", () => {
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
         .send({ data });
 
-      expect(response.body.error).toContain("admin_name");
+      expect(response.body.error).toContain("user_name");
       expect(response.status).toBe(400);
     });
 
     test("returns 400 if mobile_number is empty", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         mobile_number: "",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -394,13 +394,13 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if mobile_number is missing", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -412,14 +412,14 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if mobile number is not in format [^d{3}-d{3}-d{4}$]", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         mobile_number: "1234567890",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -429,16 +429,16 @@ describe("01 - Create Read and Update Admins", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if a different admin already exists with phone number if phone number is different from the current one", async () => {
+    test("returns 400 if a different user already exists with phone number if phone number is different from the current one", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         mobile_number: "800-555-5555",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -450,14 +450,14 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if password is empty", async () => {
       const data = {
-        admin_name: "John",
+        user_name: "John",
         mobile_number: "123-456-7890",
         password: "",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -469,13 +469,13 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if password is missing", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         mobile_number: "123-456-7890",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -487,13 +487,13 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if role is empty", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         mobile_number: "123-456-7890",
         password: "test",
         role: "",
       };
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -505,13 +505,13 @@ describe("01 - Create Read and Update Admins", () => {
 
     test("returns 400 if role is missing", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         mobile_number: "123-456-7890",
         password: "test",
       };
       
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -521,16 +521,16 @@ describe("01 - Create Read and Update Admins", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 201 if data is valid with newly created admin that has hashed password ", async () => {
+    test("returns 201 if data is valid with newly created user that has hashed password ", async () => {
       const data = {
-        admin_name: "Jane",
+        user_name: "Jane",
         mobile_number: "123-456-7890",
         password: "test",
         role: "admin",
       };
 
       const response = await request(app)
-        .put(`/admins/${adminId}`)
+        .put(`/users/${userId}`)
         .set("Accept", "application/json")
         .set("x-csrf-token", csrfResponse.body.data || null)
         .set("Cookie", csrfResponse.headers["set-cookie"] || null)
@@ -546,7 +546,7 @@ describe("01 - Create Read and Update Admins", () => {
       expect(response.body.error).toBeUndefined();
       expect(response.body.data).toEqual(
         expect.objectContaining({
-          admin_name: "Jane",
+          user_name: "Jane",
           mobile_number: "123-456-7890",
           role: "admin",
         })

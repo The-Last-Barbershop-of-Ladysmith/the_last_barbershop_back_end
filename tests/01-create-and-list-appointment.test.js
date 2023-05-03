@@ -26,7 +26,7 @@ describe("01 - Create and List Appointments", () => {
   });
 
   afterAll(async () => {
-    return await knex.migrate.rollback(null, true).then(() => knex.destroy());
+    await knex.migrate.rollback(null, true).then(() => knex.destroy());
   });
 
   describe("App", () => {

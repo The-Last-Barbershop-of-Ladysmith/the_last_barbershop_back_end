@@ -274,7 +274,7 @@ describe("04 - Provide JWT and CSRF Tokens and check authorization", () => {
     let admin;
 
     beforeEach(async () => {
-      admin = await knex("admins").where({ admin_name: "JWT TEST" }).first();
+      admin = await knex("users").where({ user_name: "JWT TEST" }).first();
     });
 
     test("returns 403 if hashed csrf token in cookies is not sent with request and csrf token not sent in request headers", async () => {
