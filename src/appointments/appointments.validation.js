@@ -44,7 +44,15 @@ function validateDateFormat(req, res, next){
         : next({ status: 400, message: stringConstants.INVALID_DATE})
 }
 
+function validateTimeFormat(req, res, next){
+    const { data: { appointment_time } } = req.body
+    const timeRegEx = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
+    const formatIsValid = timeRegEx.test(appointment_time)
+    formatIsValid
+        ? next()
+        : next({ status: 400, message: stringConstants.INVALID_TIME})
+}
 
 module.exports = {
-    create: [hasRequiredProperties, hasValidFields, validateMobileNumberFormat, validateDateFormat]
+    create: [hasRequiredProperties, hasValidFields, validateMobileNumberFormat, validateDateFormat, validateTimeFormat]
 }
