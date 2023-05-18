@@ -1,8 +1,8 @@
 /**
  * Validation middleware that checks the body of a request for field to be listed as required
- * @param  {...any} properties string of property names to be checked if included in request body
+ * @param  {String[]} properties array of property names to be checked if included in request body
  */
-function hasProperties(...properties) {
+function hasProperties(properties = []) {
     return function (req, res, next) {
       const missingFields = [];
       const { data = {} } = req.body;
