@@ -1,5 +1,6 @@
 const appointmentService = require('./appointments.service')
 const asyncErrorBoundary = require('../errors/asyncErrorBoundary')
+
 async function create(req, res){
     const newAppointment = {
         ...req.body.data, 
