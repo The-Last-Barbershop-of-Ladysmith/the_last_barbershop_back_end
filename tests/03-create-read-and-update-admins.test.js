@@ -131,7 +131,7 @@ describe("01 - Create Read and Update users", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if mobile number is not in format [^d{3}-d{3}-d{4}$]", async () => {
+    test("returns 400 if mobile number is not in format 555-555-5555", async () => {
       const data = {
         user_name: "John",
         mobile_number: "1234567890",
@@ -410,7 +410,7 @@ describe("01 - Create Read and Update users", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if mobile number is not in format [^d{3}-d{3}-d{4}$]", async () => {
+    test("returns 400 if mobile number is not in format 555-555-5555", async () => {
       const data = {
         user_name: "Jane",
         mobile_number: "1234567890",

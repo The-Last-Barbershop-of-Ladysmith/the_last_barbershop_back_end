@@ -241,7 +241,7 @@ describe("02 - Read and Update Appointments", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if mobile_number is not a string matching format ^d{3}-d{3}-d{4}$", async () => {
+    test("returns 400 if mobile_number is not a string matching format 555-555-5555", async () => {
       const appointmentURL = `/appointments/${appointment.appointment_id}`;
 
       const data = {
