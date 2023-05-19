@@ -53,6 +53,14 @@ function validateTimeFormat(req, res, next){
         : next({ status: 400, message: stringConstants.INVALID_TIME})
 }
 
+function validatePeopleIsANumber(req, res, next){
+    const { data: { people }} = req.body
+    const peopeIsNumber = Number.isInteger(people)
+    peopeIsNumber
+        ? next()
+        : next({ status: 400, message: stringConstants.PEOPLE_INVALID })
+}
+
 module.exports = {
-    create: [hasRequiredProperties, hasValidFields, validateMobileNumberFormat, validateDateFormat, validateTimeFormat]
+    create: [hasRequiredProperties, hasValidFields, validateMobileNumberFormat, validateDateFormat, validateTimeFormat, validatePeopleIsANumber]
 }
