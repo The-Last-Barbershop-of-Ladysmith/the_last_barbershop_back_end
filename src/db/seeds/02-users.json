@@ -1,11 +1,11 @@
 [
   {
-    "admin_name": "John",
+    "user_name": "John",
     "mobile_number": "855-000-0000",
     "role": "admin"
   },
   {
-    "admin_name": "Maria",
+    "user_name": "Maria",
     "mobile_number": "800-555-5555",
     "role": "admin"
   }
