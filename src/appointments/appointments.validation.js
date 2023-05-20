@@ -1,5 +1,6 @@
 const hasValidProperties = require('../errors/hasValidProperties')
 const hasProperties = require('../errors/hasProperties')
+const { createBadRequestErrorsArray, throwBadRequestErrors} = require('../errors/badRequestErrors')
 const {
     REGEX: APPT_REGEX, ERRORS: APPT_ERRORS, VALID_PROPERTIES, REQUIRED_PROPERTIES
 } = require('../utils/string-constants').APPOINTMENTS
@@ -20,9 +21,8 @@ const hasValidFields = hasValidProperties(VALID_PROPERTIES)
 function validateMobileNumberFormat(req, res, next){
     const { data : { mobile_number} } = req.body
     const formatIsValid = APPT_REGEX.PHONE.test(mobile_number)
-    formatIsValid 
-        ? next()
-        : next({ status: 400, message: APPT_ERRORS.INVALID_MOBILE_NUMBER })
+    if (!formatIsValid) res.locals.errors.push(APPT_ERRORS.INVALID_MOBILE_NUMBER) 
+    next()
 }
 
 /**
@@ -31,9 +31,8 @@ function validateMobileNumberFormat(req, res, next){
 function validateDateFormat(req, res, next){
     const { data: { appointment_date} } = req.body
     const formatIsValid = APPT_REGEX.DATE.test(appointment_date)
-    formatIsValid
-        ? next()
-        : next({ status: 400, message: APPT_ERRORS.INVALID_DATE })
+    if (!formatIsValid) res.locals.errors.push(APPT_ERRORS.INVALID_DATE)
+    next()
 }
 
 /**
@@ -42,9 +41,8 @@ function validateDateFormat(req, res, next){
 function validateTimeFormat(req, res, next){
     const { data: { appointment_time } } = req.body
     const formatIsValid = APPT_REGEX.TIME.test(appointment_time)
-    formatIsValid
-        ? next()
-        : next({ status: 400, message: APPT_ERRORS.INVALID_TIME })
+    if (!formatIsValid) res.locals.errors.push(APPT_ERRORS.INVALID_TIME)
+    next()
 }
 
 /**
@@ -53,18 +51,19 @@ function validateTimeFormat(req, res, next){
 function validatePeopleIsANumber(req, res, next){
     const { data: { people }} = req.body
     const peopeIsNumber = Number.isInteger(people)
-    peopeIsNumber
-        ? next()
-        : next({ status: 400, message: APPT_ERRORS.PEOPLE_INVALID })
+    if (!peopeIsNumber) res.locals.errors.push(APPT_ERRORS.PEOPLE_INVALID)
+    next()
 }
 
 module.exports = {
     create: [
+        createBadRequestErrorsArray,
         hasRequiredProperties, 
         hasValidFields, 
         validateMobileNumberFormat, 
         validateDateFormat, 
         validateTimeFormat, 
-        validatePeopleIsANumber
+        validatePeopleIsANumber,
+        throwBadRequestErrors
     ]
 }

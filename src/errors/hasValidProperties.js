@@ -12,14 +12,12 @@ function hasValidProperties(VALID_PROPERTIES = []) {
         );
         //If the invalid fields array has properties not listed, throw an error including all non valid fields
         if (invalidFields.length) {
-          const error = new Error(`Invalid field(s): ${invalidFields.join(",")}`);
-          error.status = 400;
-          throw error;
+          res.locals.errors.push(`Invalid field(s): ${invalidFields.join(",")}`);
         }
-        next();
       } catch (error) {
-        next(error);
+        res.locals.errors.push(error.message)
       }
+      next()
     };
   }
   
