@@ -1,5 +1,5 @@
 const knex = require("../db/connection");
-const { APPOINTMENTS_TABLE } = require('../utils/string-constants')
+const { TABLE_NAME: APPOINTMENTS_TABLE } = require('../utils/string-constants').APPOINTMENTS
 
 function create(newAppointment){
     return knex(APPOINTMENTS_TABLE)
