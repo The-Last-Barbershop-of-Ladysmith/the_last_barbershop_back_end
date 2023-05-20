@@ -40,5 +40,12 @@ function validatePeopleIsANumber(req, res, next){
 }
 
 module.exports = {
-    create: [hasRequiredProperties, hasValidFields, validateMobileNumberFormat, validateDateFormat, validateTimeFormat, validatePeopleIsANumber]
+    create: [
+        hasRequiredProperties, 
+        hasValidFields, 
+        validateMobileNumberFormat, 
+        validateDateFormat, 
+        validateTimeFormat, 
+        validatePeopleIsANumber
+    ]
 }
