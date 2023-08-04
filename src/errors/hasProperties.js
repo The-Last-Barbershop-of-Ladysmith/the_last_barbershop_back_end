@@ -5,7 +5,8 @@
 function hasProperties(properties = []) {
     return function (req, res, next) {
       const missingFields = [];
-      const { data = {} } = req.body;
+      const { data } = req.body;
+      if(!data) next({status: 400, message: 'Request data property not found'})
       try {
         //loop the the property names
         properties.forEach((property) => {
@@ -14,7 +15,7 @@ function hasProperties(properties = []) {
             missingFields.push(property);
           }
         });
-        //If there are missing fields, throw an error with all missing properties
+        //If there are missing fields, build an error with all missing properties
         if (missingFields.length) {
           res.locals.errors.push(`Required field(s) not recieved: ${missingFields.join(", ")}`)
         }
