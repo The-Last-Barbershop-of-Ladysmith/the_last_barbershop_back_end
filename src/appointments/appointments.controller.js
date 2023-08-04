@@ -1,4 +1,5 @@
 const appointmentService = require('./appointments.service')
+const validate = require('./appointments.validation')
 const asyncErrorBoundary = require('../errors/asyncErrorBoundary')
 const { STATUS: APPT_STATUS } = require('../utils/string-constants').APPOINTMENTS
 
@@ -12,5 +13,5 @@ async function create(req, res){
 }
 
 module.exports = {
-    create: asyncErrorBoundary(create)
+    create: [...validate.create, asyncErrorBoundary(create)]
 }
